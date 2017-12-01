@@ -1,0 +1,42 @@
+def shot(wall1, wall2, shot_point, later_point):#m1,c1 are the slope and intercept of the wall respectively
+    import math
+    import numpy as np
+    angle_lower_wall = [math.atan2(wall1[1]-shot_point[1],wall1[0]-shot_point[0]) if math.atan2(wall1[1]-shot_point[1],wall1[0]-shot_point[0]) >=0 else 2*math.pi + math.atan2(wall1[1]-shot_point[1],wall1[0]-shot_point[0])]
+    angle_upper_wall = [math.atan2(wall2[1]-shot_point[1],wall2[0]-shot_point[0]) if math.atan2(wall2[1]-shot_point[1],wall2[0]-shot_point[0]) >=0 else 2*math.pi + math.atan2(wall2[1]-shot_point[1],wall2[0]-shot_point[0])]
+    angle_shot =  [math.atan2(later_point[1]-shot_point[1],later_point[0]-shot_point[0]) if math.atan2(later_point[1]-shot_point[1],later_point[0]-shot_point[0]) >=0 else 2*math.pi + math.atan2(later_point[1]-shot_point[1],later_point[0]-shot_point[0])]  
+    if ((angle_shot <= angle_lower_wall) and (angle_shot >= angle_upper_wall)) or ((angle_shot <= angle_upper_wall) and (angle_shot >= angle_lower_wall)):
+       if (angle_shot < angle_lower_wall) and (angle_shot > angle_upper_wall) or ((angle_shot < angle_upper_wall) and (angle_shot > angle_lower_wall)):
+           if math.atan2(wall2[1]-wall1[1],wall2[0]-wall1[0])*180/math.pi == 90 or math.atan2(wall2[1]-wall1[1],wall2[0]-wall1[0])*180/math.pi == -90:
+              x_intercept = wall2[0]
+              if math.atan2(later_point[1]-shot_point[1],later_point[0]-shot_point[0])*180/math.pi == 0 or math.atan2(later_point[1]-shot_point[1],later_point[0]-shot_point[0])*180/math.pi == 180:
+                 y_intercept = later_point[1]
+              else:
+                 [m_shot,c_shot] = list(np.linalg.solve(np.array([[list(shot_point)[0],1],[list(later_point)[0],1]]),np.array([list(shot_point)[1],list(later_point)[1]])))
+                 y_intercept = m_shot*x_intercept + c_shot
+           elif math.atan2(wall2[1]-wall1[1],wall2[0]-wall1[0])*180/math.pi == 0 or math.atan2(wall2[1]-wall1[1],wall2[0]-wall1[0])*180/math.pi == 180:
+              y_intercept = wall2[1]
+              if math.atan2(later_point[1]-shot_point[1],later_point[0]-shot_point[0])*180/math.pi == 90 or math.atan2(later_point[1]-shot_point[1],later_point[0]-shot_point[0])*180/math.pi == -90:
+                 x_intercept = later_point[0]
+              else:
+                 [m_shot,c_shot] = list(np.linalg.solve(np.array([[list(shot_point)[0],1],[list(later_point)[0],1]]),np.array([list(shot_point)[1],list(later_point)[1]])))
+                 x_intercept = (y_intercept-c_shot)/m_shot
+           else: 
+              [m_wall,c_wall] = list(np.linalg.solve(np.array([[list(wall1)[0],1],[list(wall2)[0],1]]),np.array([list(wall1)[1],list(wall2)[1]]))) 
+              [m_shot,c_shot] = list(np.linalg.solve(np.array([[list(shot_point)[0],1],[list(later_point)[0],1]]),np.array([list(shot_point)[1],list(later_point)[1]])))
+              [x_intercept,y_intercept] = list(np.linalg.solve(np.array([[m_wall,-1],[m_shot,-1]]),np.array([-c_wall,-c_shot])))
+           [mid_wall_x,mid_wall_y]=[(wall1[0]+wall2[0])/2,(wall1[1]+wall2[1])/2]
+           length_wall = math.sqrt((wall1[0]-wall2[0])**2 + (wall1[1]-wall2[1])**2)
+           deviation_of_the_shot = math.sqrt((mid_wall_x-x_intercept)**2+(mid_wall_y-y_intercept)**2)
+           points_to_deduct = 200*deviation_of_the_shot/length_wall
+           return round(100 - points_to_deduct)
+       return 0
+    return -1
+     
+    #replace this for solution
+if __name__ == '__main__':
+    #These "asserts" using only for self-checking and not necessary for auto-testing
+    assert shot((2, 2), (5, 7), (11, 2), (8, 3)) == 100, "1st case"
+    assert shot((2, 2), (5, 7), (11, 2), (7, 2)) == 0, "2nd case"
+    assert shot((2, 2), (5, 7), (11, 2), (8, 4)) == 29, "3th case"
+    assert shot((2, 2), (5, 7), (11, 2), (9, 5)) == -1, "4th case"
+    assert shot((2, 2), (5, 7), (11, 2), (10.5, 3)) == -1, "4th case again"
