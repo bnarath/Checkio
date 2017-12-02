@@ -1,0 +1,21 @@
+def berserk_rook(berserker, enemies):
+    import math
+    list_neighbor_enemies = [neigh for neigh in list(enemies) if (berserker[0] in neigh)or(berserker[1] in neigh)]
+    all_vertical_rooks = sorted([neigh for neigh in list(enemies) if (berserker[0] in neigh)]+list([berserker]),key=lambda x:x[1])
+    all_horizontal_rooks = sorted([neigh for neigh in list(enemies) if (berserker[1] in neigh)]+list([berserker]),key=lambda x:x[0])
+    vertical_neigh=[rooks for rooks in all_vertical_rooks if math.sqrt((all_vertical_rooks.index(berserker)-all_vertical_rooks.index(rooks))**2)==1]
+    horizontal_neigh=[rooks for rooks in all_horizontal_rooks if math.sqrt((all_horizontal_rooks.index(berserker)-all_horizontal_rooks.index(rooks))**2)==1]
+    list_neighbor_enemies=vertical_neigh+horizontal_neigh
+    if len(list_neighbor_enemies)==0:
+        return 0
+    else:
+       neig_max = [0 for i in range(len(list_neighbor_enemies))]
+       for neigh in list_neighbor_enemies:
+           print(berserker,neigh, enemies.difference(set(neigh)))
+           neig_max[list_neighbor_enemies.index(neigh)] = 1+berserk_rook(neigh,enemies.difference(set([neigh])))
+       return max(neig_max)
+if __name__ == '__main__':
+    #These "asserts" using only for self-checking and not necessary for auto-testing
+    assert berserk_rook('d3', {'d6', 'b6', 'c8', 'g4', 'b8', 'g6'}) == 5, "one path"
+    assert berserk_rook('a2', {'f6', 'f2', 'a6', 'f8', 'h8', 'h6'}) == 6, "several paths"
+    assert berserk_rook('a2', {'f6', 'f8', 'f2', 'a6', 'h6'}) == 4, "Don't jump through"
